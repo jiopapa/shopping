@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script>
+function detail(purchaseNum){
+	window.open("purchaseDetail?purchaseNum="+purchaseNum, 
+			"purchaseDetail","top='100',left='100',width=1000,height=800");
+}
+</script>
+</head>
+<body>
+구매목록<br />
+<table width="800" align = "center"><!-- purchase, payment,goods  -->
+   <tr><td>주문일(결제번호)</td> <td>상품명(이미지) / 주문번호</td>   
+      <td>주문상태</td></tr><!-- (결제대기중,상품준비중,배송중, 배송완료) -->
+      
+   <tr th:each=" orderListDTO : ${list}">
+      <td>[[${#dates.format(orderListDTO.purchaseDTO.purchaseDate,'yyyy-MM-dd')}]](
+         <th:block th:if="${orderListDTO.paymentDTO.appltime == null}">
+            결제대기중
+         </th:block>
+         <th:block th:if="${orderListDTO.paymentDTO.appltime != null}">
+            <th:block th:if="${orderListDTO.paymentDTO.confirmnumber == null}">
+               현금결제
+            </th:block>
+            <th:block th:if="${orderListDTO.paymentDTO.confirmnumber != null}">
+            [[${orderListDTO.paymentDTO.confirmnumber}]]
+            </th:block>
+         </th:block>)
+      </td> 
+      <td> 
+         <th:block th:each="dto : ${orderListDTO.purchaseListGoodsDTOs}" >
+            <img th:src="|/static/upload/${dto.goods.goodsMainStore}|" width="30" />
+            ([[${dto.goods.goodsName}]]) 
+         </th:block> / 
+         <a th:href="|javascript:detail('${orderListDTO.purchaseDTO.purchaseNum}')|">[[${orderListDTO.purchaseDTO.purchaseNum}]]</a></td>   
+      <td>
+      <th:block th:if="${orderListDTO.paymentDTO.appltime != null}">
+         <th:block th:if="${orderListDTO.delivery == null}">
+            <th:block th:if="${orderListDTO.purchaseDTO.purchaseStatus =='상품준비중'}">
+               상품준비중
+            </th:block>
+            <th:block th:if="${orderListDTO.purchaseDTO.purchaseStatus =='결제완료'}">
+               <a th:href="|paymentDel?purchaseNum=${orderListDTO.purchaseDTO.purchaseNum}|">결제취소</a>
+            </th:block>
+         </th:block>
+         <th:block th:if="${orderListDTO.delivery != null}">
+            <span th:if="${orderListDTO.delivery.deliveryState == '배송중'}">[[${orderListDTO.delivery.deliveryState}]]</span> 
+            <span th:if="${orderListDTO.delivery.deliveryState == '배송완료'}" th:text="배송완료"></span> | 
+            
+            <th:block th:each="dto : ${orderListDTO.purchaseListGoodsDTOs}">
+            <a th:if="${orderListDTO.delivery.deliveryState == '배송완료' and dto.review ==null}" 
+            th:href="@{/review/goodsReview(goodsNum=${dto.goods.goodsNum}
+            							,purchaseNum=${orderListDTO.purchaseDTO.purchaseNum})}">후기입력</a>
+            <th:block th:if="${dto.review != null}">
+            <a th:href="@{/review/goodsReviewUpdate(reviewNum=${dto.review.reviewNum}
+            										,goodsNum=${dto.goods.goodsNum})}">후기 수정</a> |
+            <a th:href="@{/review/goodsReviewDelete(reviewNum=${dto.review.reviewNum})}">후기 삭제</a>
+            
+            </th:block>
+            </th:block>
+            
+         </th:block>
+      </th:block>
+      <th:block th:if="${orderListDTO.paymentDTO.appltime == null}">
+         <a th:href="|paymentOk?purchaseNum=${orderListDTO.purchaseDTO.purchaseNum}|">결제하기</a>
+      </th:block>
+      </td>
+   </tr>
+</table>
+</body>
+</html>

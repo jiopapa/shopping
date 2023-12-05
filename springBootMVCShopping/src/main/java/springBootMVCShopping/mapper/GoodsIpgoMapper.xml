@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 	
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="springBootMVCShopping.mapper.GoodsIpgoMapper">
+<insert id="goodsIpgoInsert" parameterType="goodsIpgo">
+insert into goodsIpgo (ipgo_num, goods_num, ipgo_qty, ipgo_date, made_date, ipgo_price, emp_num)
+values(#{ipgoNum},#{goodsNum},#{ipgoQty},#{ipgoDate},#{madeDate},#{ipgoPrice},#{empNum})
+</insert>
+
+<resultMap type="goodsIpgo" id="goodsIpgoResultMap">
+	<constructor> <!-- idarg 프라이머리키 arg 일반키 -->
+	<idArg column="ipgo_num" javaType="string"/>  
+	<idArg column="goods_num" javaType="string"/>
+	<arg column="ipgo_qty" javaType="integer"/>
+	<arg column="ipgo_date" javaType="java.util.Date"/>
+	<arg column="made_date" javaType="java.util.Date"/>
+	<arg column="ipgo_price" javaType="integer"/>
+	<arg column="emp_num" javaType="string"/>
+	
+	</constructor>
+
+</resultMap>
+
+<sql id="baseColumns">
+ipgo_num , goods_num , ipgo_qty , ipgo_date , made_date , ipgo_price , emp_num 
+</sql>
+
+<select id="goodsIpgoAllSelect" resultMap="goodsIpgoResultMap">
+<!-- resultmap사용으로 컬럼명 따로 명명안해줘도 됨 -->
+select ipgo_num , goods_num , ipgo_qty , ipgo_date , made_date , ipgo_price , emp_num 
+from goodsIpgo
+</select>
+
+<select id="selectIpgoGoods" resultMap="goodsIpgoResultMap">
+select <include refid="baseColumns"/>
+from goodsIpgo
+where ipgo_num = #{arg0} and goods_num=#{arg1}
+</select>
+<delete id="ipgoGoodsNumDelete" parameterType="string">
+delete from goodsIpgo
+where ipgo_num = #{ipgoNum} and goods_num = #{goodsNum}
+</delete>
+
+<update id="goodsIpgoUpdate" parameterType="goodsIpgo">
+update goodsIpgo set ipgo_qty = #{ipgoQty}, ipgo_date = #{ipgoDate}, made_date =#{madeDate}, ipgo_price =#{ipgoPrice}
+where ipgo_num=#{ipgoNum} and goods_num = #{goodsNum}
+</update>
+
+</mapper>
